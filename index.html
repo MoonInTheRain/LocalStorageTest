@@ -20,8 +20,8 @@
     <link rel="icon" href="favicon.ico"/>
   </head>
   <body>
-    <h1 class="header">LocalStrageTest</h1>
-
+    <button type="button", onclick="output()">データ出力</button>
+    <input type="file" id="test">
     <div id="GameDiv" cc_exact_fit_screen="false" style="width: 1280px; height: 960px;">
       <div id="Cocos3dGameContainer">
         <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>
@@ -40,7 +40,27 @@
 <script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
 
 <script>
-    System.import('./index.js').catch(function(err) { console.error(err); })
+    System.import('./index.js').catch(function(err) { console.error(err); });
+
+    function output() {
+      const json = localStorage.getItem("test");
+      if (!json){
+        alert("LocalStorageにデータがありません。");
+        return;
+      }
+      const blob = new Blob([json], {type: "application/json"})
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "test.json";
+      link.click();
+    }
+
+    const fileInput = document.getElementById("test");
+    const handleFileSelect = () => {
+      console.log(fileInput);
+    }
+    fileInput.addEventListener("change", handleFileSelect);
 </script>
   </body>
 </html>
