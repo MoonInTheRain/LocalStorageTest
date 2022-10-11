@@ -20,8 +20,15 @@
     <link rel="icon" href="favicon.ico"/>
   </head>
   <body>
-    <button type="button", onclick="output()">データ出力</button>
-    <input type="file" id="test">
+    <div>
+      <h5>LocalStorageからデータをダウンロード</h5>
+      <button type="button" , onclick="output()">データ出力</button>
+    </div>
+    <div>
+      <h5>LocalStorageにデータをインポート</h5>
+      <input type="file" id="test">
+    </div>
+    <br>
     <div id="GameDiv" cc_exact_fit_screen="false" style="width: 1280px; height: 960px;">
       <div id="Cocos3dGameContainer">
         <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>
@@ -58,9 +65,50 @@
 
     const fileInput = document.getElementById("test");
     const handleFileSelect = () => {
-      console.log(fileInput);
+      const file = fileInput.files[0];
+      if (file == null) {
+        alert("ファイルを１つだけ選択してください。");
+        return;
+      }
+      const res = confirm("LocalStorageを書き換えてページを更新します。");
+      if (res !== true){
+        fileInput.value = [];
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const parsed = parseDataURL(event.target.result);
+        let result;
+        try{
+          result = parsed.isBase64 ? atob(parsed.data) : decodeURIComponent(parsed.data);
+        }
+        catch(e){
+          console.error(e);
+        }
+        console.log(result);
+        localStorage.setItem("test", result);
+        location.reload();
+      }
+      reader.readAsDataURL(file);
     }
     fileInput.addEventListener("change", handleFileSelect);
+
+    function parseDataURL(dataURL) {
+      var result = {
+        mediaType: null,
+        encoding: null,
+        isBase64: null,
+        data: null
+      };
+      if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
+        result.mediaType = RegExp.$1 || 'text/plain';
+        result.encoding = RegExp.$3 || 'US-ASCII';
+        result.isBase64 = String(RegExp.$4) === ';base64';
+        result.data = RegExp.$5;
+      }
+      return result;
+    }
+
 </script>
   </body>
 </html>
